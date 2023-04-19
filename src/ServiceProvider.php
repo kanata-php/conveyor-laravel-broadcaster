@@ -2,7 +2,6 @@
  
 namespace App\Providers;
  
-use App\Services\Riak\Connection;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
  
@@ -13,8 +12,8 @@ class ConveyorServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(Connection::class, function (Application $app) {
-            return new Connection(config('riak'));
+        $this->app->singleton('conveyor', function (Application $app) {
+            return new Conveyor();
         });
     }
 }
