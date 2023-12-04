@@ -1,6 +1,6 @@
 {
-    "name": "kanata-php/laravel-broadcaster",
-    "description": "Laravel Conveyor Broadcaster",
+    "name": "kanata-php/conveyor-laravel-broadcaster",
+    "description": "Conveyor Laravel Broadcaster",
     "autoload": {
         "psr-4": {
             "Kanata\\LaravelBroadcaster\\": "src/"

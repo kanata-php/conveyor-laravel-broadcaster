@@ -1,5 +1,5 @@
 
-# Laravel Broadcaster
+# Conveyor Laravel Broadcaster
 
 This is a Laravel Integration for [**Socker Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel.
 
@@ -10,7 +10,7 @@ If you want to run a WebSocket server using Laravel, you can use [**Jacked Serve
 **Step 1**: Install the package via composer:
 
 ```bash
-composer require kanata/laravel-broadcaster
+composer require kanata/conveyor-laravel-broadcaster
 ```
 
 **Step 2**: Publish the configuration:
