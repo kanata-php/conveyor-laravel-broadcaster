@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use MyCode\DB\Models\Token;
+use Kanata\LaravelBroadcaster\Models\Token;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class JwtToken
@@ -37,11 +37,11 @@ class JwtToken
         $authorization = current($authorization);
         $authorization = explode(' ', $authorization);
 
-        if ($authorization[0] !== 'Bearer') {
+        if (isset($authorization[0]) || $authorization[0] !== 'Bearer') {
             return null;
         }
 
-        $token = $authorization[1];
+        $token = $authorization[1] ?? null;
 
         try {
             $tokenRecord = Token::where('token', $token)->first()->consume();
@@ -77,7 +77,7 @@ class JwtToken
             'expire_at' => null,
         ];
 
-        if (null !== $expire) {
+        if ($expire instanceof Carbon) {
             $payload["exp"] = $expire->timestamp;
             $tokenData['expire_at'] = $expire->format('Y-m-d H:i:s');
         }
