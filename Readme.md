@@ -58,6 +58,14 @@ CONVEYOR_PROTOCOL=ws
 CONVEYOR_QUERY="token=123456"
 ```
 
+---
+
+At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server. To undertand how to broadcast, see [Broadcasting](https://laravel.com/docs/10.x/broadcasting).
+
+The following steps are optional, but they can be useful if you want to integrate with the Conveyor WebSocket server from other implementations/applications.
+
+---
+
 **(Extra) Step 6**: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
 
 ```bash
