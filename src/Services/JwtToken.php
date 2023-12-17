@@ -2,21 +2,21 @@
 
 namespace Kanata\LaravelBroadcaster\Services;
 
-use Carbon\Carbon;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Support\Carbon;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class JwtToken
 {
-    const HS256_ALGORITHM = 'HS256';
+    public const HS256_ALGORITHM = 'HS256';
 
     /**
      * @param string $token
      * @param string $name
-     * @return array
+     * @return array<array-key, string>
      */
     public static function decodeJwtToken(string $token, string $name): array
     {

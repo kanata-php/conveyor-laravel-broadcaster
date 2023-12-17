@@ -1,6 +1,7 @@
 <?php
 
 namespace Kanata\LaravelBroadcaster;
+
 use App\Models\User;
 use Conveyor\Models\WsAssociation;
 use Exception;
@@ -17,7 +18,8 @@ class ConveyorDriver extends BaseBroadcaster
 
     public function __construct(
         protected Conveyor $conveyor
-    ) {}
+    ) {
+    }
 
     public function auth($request)
     {
@@ -32,11 +34,12 @@ class ConveyorDriver extends BaseBroadcaster
                 && ! $this->retrieveUser($request, $channelName)
             )
         ) {
-            throw new AccessDeniedHttpException;
+            throw new AccessDeniedHttpException();
         }
 
         return parent::verifyUserCanAccessChannel(
-            $request, $channelName
+            $request,
+            $channelName
         );
     }
 
@@ -68,6 +71,12 @@ class ConveyorDriver extends BaseBroadcaster
         $tokenInstance->consume();
     }
 
+    /**
+     * @param array $channels
+     * @param string $event
+     * @param array $payload
+     * @return void
+     */
     public function broadcast(array $channels, $event, array $payload = [])
     {
         $this->conveyor->broadcast($channels, $event, $payload);

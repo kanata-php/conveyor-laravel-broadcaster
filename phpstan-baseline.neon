@@ -1,0 +1,341 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Function env not found\\.$#"
+			count: 4
+			path: config/conveyor.php
+
+		-
+			message: "#^Call to method dateTime\\(\\) on an unknown class Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to method foreignId\\(\\) on an unknown class Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to method id\\(\\) on an unknown class Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to method integer\\(\\) on an unknown class Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 2
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to method string\\(\\) on an unknown class Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 4
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to method timestamps\\(\\) on an unknown class Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to static method create\\(\\) on an unknown class Illuminate\\\\Support\\\\Facades\\\\Schema\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Call to static method dropIfExists\\(\\) on an unknown class Illuminate\\\\Support\\\\Facades\\\\Schema\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Parameter \\$table of anonymous function has invalid type Illuminate\\\\Database\\\\Schema\\\\Blueprint\\.$#"
+			count: 1
+			path: database/migrations/2023_08_25_224110_create_conveyor_tokens_table.php
+
+		-
+			message: "#^Access to property \\$name on an unknown class Illuminate\\\\Broadcasting\\\\Channel\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Access to property \\$name on an unknown class Illuminate\\\\Broadcasting\\\\PrivateChannel\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Call to method close\\(\\) on an unknown class WebSocket\\\\Client\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Call to method text\\(\\) on an unknown class WebSocket\\\\Client\\.$#"
+			count: 2
+			path: src/Conveyor.php
+
+		-
+			message: "#^Function config not found\\.$#"
+			count: 5
+			path: src/Conveyor.php
+
+		-
+			message: "#^Instantiated class WebSocket\\\\Client not found\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Conveyor\\:\\:broadcast\\(\\) has parameter \\$event with no type specified\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Conveyor\\:\\:broadcast\\(\\) has parameter \\$payload with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Parameter \\$channels of method Kanata\\\\LaravelBroadcaster\\\\Conveyor\\:\\:broadcast\\(\\) has invalid type Illuminate\\\\Broadcasting\\\\Channel\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Parameter \\$channels of method Kanata\\\\LaravelBroadcaster\\\\Conveyor\\:\\:broadcast\\(\\) has invalid type Illuminate\\\\Broadcasting\\\\PrivateChannel\\.$#"
+			count: 1
+			path: src/Conveyor.php
+
+		-
+			message: "#^Access to an undefined property Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:\\$token\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Access to property \\$id on an unknown class App\\\\Models\\\\User\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:isGuardedChannel\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:normalizeChannelName\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:retrieveUser\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to an undefined static method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:byToken\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to static method create\\(\\) on an unknown class Conveyor\\\\Models\\\\WsAssociation\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to static method uuid4\\(\\) on an unknown class Ramsey\\\\Uuid\\\\Uuid\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Function auth not found\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Instantiated class Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\AccessDeniedHttpException not found\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:auth\\(\\) calls parent\\:\\:verifyUserCanAccessChannel\\(\\) but Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver does not extend any class\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:auth\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:auth\\(\\) has parameter \\$request with no type specified\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:broadcast\\(\\) has parameter \\$channels with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:broadcast\\(\\) has parameter \\$payload with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:validAuthenticationResponse\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:validAuthenticationResponse\\(\\) has parameter \\$request with no type specified\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:validAuthenticationResponse\\(\\) has parameter \\$result with no type specified\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Parameter \\$user of method Kanata\\\\LaravelBroadcaster\\\\ConveyorDriver\\:\\:associateUser\\(\\) has invalid type App\\\\Models\\\\User\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Throwing object of an unknown class Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\AccessDeniedHttpException\\.$#"
+			count: 1
+			path: src/ConveyorDriver.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\ConveyorServiceProvider\\:\\:loadMigrationsFrom\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorServiceProvider.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\ConveyorServiceProvider\\:\\:mergeConfigFrom\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorServiceProvider.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\ConveyorServiceProvider\\:\\:publishes\\(\\)\\.$#"
+			count: 1
+			path: src/ConveyorServiceProvider.php
+
+		-
+			message: "#^Call to static method extend\\(\\) on an unknown class Illuminate\\\\Support\\\\Facades\\\\Broadcast\\.$#"
+			count: 1
+			path: src/ConveyorServiceProvider.php
+
+		-
+			message: "#^Function config_path not found\\.$#"
+			count: 1
+			path: src/ConveyorServiceProvider.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\ConveyorServiceProvider\\:\\:register\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ConveyorServiceProvider.php
+
+		-
+			message: "#^Instantiated class Illuminate\\\\Broadcasting\\\\PrivateChannel not found\\.$#"
+			count: 1
+			path: src/Events/BroadcastingMessage.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Events\\\\BroadcastingMessage\\:\\:broadcastOn\\(\\) has invalid return type Illuminate\\\\Broadcasting\\\\Channel\\.$#"
+			count: 1
+			path: src/Events/BroadcastingMessage.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Events\\\\BroadcastingMessage\\:\\:broadcastOn\\(\\) should return array\\<int, Illuminate\\\\Broadcasting\\\\Channel\\> but returns array\\<int, Illuminate\\\\Broadcasting\\\\PrivateChannel\\>\\.$#"
+			count: 1
+			path: src/Events/BroadcastingMessage.php
+
+		-
+			message: "#^Parameter \\$user of method Kanata\\\\LaravelBroadcaster\\\\Events\\\\BroadcastingMessage\\:\\:__construct\\(\\) has invalid type App\\\\Models\\\\User\\.$#"
+			count: 1
+			path: src/Events/BroadcastingMessage.php
+
+		-
+			message: "#^Property Kanata\\\\LaravelBroadcaster\\\\Events\\\\BroadcastingMessage\\:\\:\\$user has unknown class App\\\\Models\\\\User as its type\\.$#"
+			count: 1
+			path: src/Events/BroadcastingMessage.php
+
+		-
+			message: "#^Access to an undefined property Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:\\$uses\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:belongsTo\\(\\)\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:decrement\\(\\)\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Call to an undefined method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:delete\\(\\)\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Class App\\\\Models\\\\User not found\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:scopeByToken\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:scopeByToken\\(\\) has parameter \\$query with no type specified\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:user\\(\\) has invalid return type Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\BelongsTo\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Property Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:\\$defaults type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Property Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:\\$fillable has no type specified\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Property Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:\\$table has no type specified\\.$#"
+			count: 1
+			path: src/Models/Token.php
+
+		-
+			message: "#^Access to property \\$timestamp on an unknown class Illuminate\\\\Support\\\\Carbon\\.$#"
+			count: 1
+			path: src/Services/JwtToken.php
+
+		-
+			message: "#^Call to an undefined static method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: src/Services/JwtToken.php
+
+		-
+			message: "#^Call to an undefined static method Kanata\\\\LaravelBroadcaster\\\\Models\\\\Token\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: src/Services/JwtToken.php
+
+		-
+			message: "#^Call to method format\\(\\) on an unknown class Illuminate\\\\Support\\\\Carbon\\.$#"
+			count: 1
+			path: src/Services/JwtToken.php
+
+		-
+			message: "#^Call to static method now\\(\\) on an unknown class Illuminate\\\\Support\\\\Carbon\\.$#"
+			count: 2
+			path: src/Services/JwtToken.php
+
+		-
+			message: "#^Class Illuminate\\\\Support\\\\Carbon not found\\.$#"
+			count: 1
+			path: src/Services/JwtToken.php
