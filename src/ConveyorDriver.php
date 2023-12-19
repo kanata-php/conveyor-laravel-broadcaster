@@ -4,9 +4,12 @@ namespace Kanata\LaravelBroadcaster;
 
 use App\Models\User;
 use Conveyor\Models\WsAssociation;
+use Conveyor\Persistence\Interfaces\GenericPersistenceInterface;
+use Conveyor\Persistence\Interfaces\UserAssocPersistenceInterface;
 use Exception;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster as BaseBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
+use Illuminate\Support\Facades\Cache;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Kanata\LaravelBroadcaster\Services\JwtToken;
 use Ramsey\Uuid\Uuid;
@@ -82,15 +85,24 @@ class ConveyorDriver extends BaseBroadcaster
         $this->conveyor->broadcast($channels, $event, $payload);
     }
 
-    public function associateUser(int $fd, ?User $user): void
-    {
-        if (null === $user) {
+    /**
+     * @param int $fd
+     * @param User|null $user
+     * @param ?UserAssocPersistenceInterface $assocPersistence
+     * @return void
+     */
+    public function associateUser(
+        int $fd,
+        ?User $user,
+        ?UserAssocPersistenceInterface $assocPersistence,
+    ): void {
+        if (null === $user || null === $assocPersistence) {
             return;
         }
 
-        WsAssociation::create([
-            'fd' => $fd,
-            'user_id' => $user->id,
-        ]);
+        $assocPersistence->assoc(
+            fd: $fd,
+            userId: $user->id,
+        );
     }
 }
