@@ -10,7 +10,7 @@ If you want to run a WebSocket server using Laravel, you can use [**Jacked Serve
 **Step 1**: Install the package via composer:
 
 ```bash
-composer require kanata/conveyor-laravel-broadcaster
+composer require kanata-php/conveyor-laravel-broadcaster
 ```
 
 **Step 2**: Publish the configuration:
