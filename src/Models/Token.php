@@ -39,6 +39,10 @@ class Token extends Model
 
     public function consume(): self
     {
+        if (null === $this->uses) {
+            return $this;
+        }
+
         if ($this->uses < 2) {
             $this->delete();
         } else {
