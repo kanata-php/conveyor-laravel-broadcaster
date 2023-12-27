@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('aud', 100)->nullable()->comment('Audience: domain allowed to use token. Null when not restricted.');
             $table->string('aud_protocol', 10)->nullable();
             $table->integer('allowed_uses')->nullable()->comment('Number of times this token is allowed to be used.');
-            $table->integer('uses')->default(0)->comment('Number of times this token as been used.');
+            $table->integer('uses')->nullable()->comment('Number of times this token as been used.');
             $table->foreignId('user_id');
             $table->timestamps();
         });
