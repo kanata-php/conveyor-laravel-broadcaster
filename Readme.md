@@ -1,9 +1,9 @@
 
 # Conveyor Laravel Broadcaster
 
-This is a Laravel Integration for [**Socker Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel.
+This is a Laravel Integration for [**Socket Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel.
 
-If you want to run a WebSocket server using Laravel, you can use [**Jacked Server**](https://github.com/jacked-php/jacked-server), so your Laravel can serve itself, and, at the same port, it will serve the WebSocket server with Socket Conveyor out-of-the-box. You'll be able to customize it in the Laravel installation where you run it from.
+**Recommended**: If you want to run a WebSocket server using Laravel, you can use [**Jacked Server**](https://github.com/jacked-php/jacked-server), so your Laravel can serve itself, and, at the same port, it will serve the WebSocket server with Socket Conveyor out-of-the-box. You'll be able to customize it in the Laravel installation where you run it from.
 
 ## Installation
 
@@ -58,6 +58,18 @@ CONVEYOR_PROTOCOL=ws
 CONVEYOR_QUERY="token=123456"
 ```
 
+> Keep in the query a token with no use limits. You can create one with this:
+> ```php
+> use Kanata\JWT\JwtToken;
+> 
+> $token = JwtToken::create(
+>     name: 'some-token',
+>     userId: $user->id,
+>     expire: null,
+>     // no use limits
+> );
+> ```
+
 ---
 
 At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server. To undertand how to broadcast, see [Broadcasting](https://laravel.com/docs/10.x/broadcasting).
@@ -83,12 +95,18 @@ var connection = new Conveyor({
     protocol: 'ws',
     uri: '127.0.0.1',
     port: 8000,
+    query: '?token=' + conveyorToken, // if needed
     channel: 'my-channel',
+    reconnect: true,
     onMessage: (e) => {
         // your callback here
     },
     onReady: () => {
         // your callback here
+    },
+    onReconnectCallback: async () => {
+        // here you renew your token
+        connection.setOption('query', '?token=' + myNewtoken);
     },
 });
 
@@ -121,6 +139,34 @@ $options = [
 $client = new Client($options);
 $client->connect();
 ```
+
+> **Info:** If you want to send one-off messages to the Conveyor WebSocket server, you can do like this:
+> ```php
+> // this laravel helper (rescue) is a pretty alternative to try/catch
+> rescue(
+>     callback: function () use ($channel, $payload) {
+>         $options = [
+>             'protocol' => config('conveyor.protocol', 'ws'),
+>             'host' => config('conveyor.uri', '127.0.0.1'),
+>             'port' => config('conveyor.port', 8002),
+>             'query' => '?'.config('conveyor.query', ''),
+>             'channel' => $channel->name,
+>             'timeout' => 1,
+>             'onReadyCallback' => function(Client $currentClient) use ($payload) {
+>                 $currentClient->send($payload['message']);
+>             },
+>         ];
+>         $client = new Client($options);
+>         $client->connect();
+>     },
+>     rescue: function (Exception $e) {
+>         if ($e instanceof TimeoutException) {
+>             return;
+>         }
+>         Log::info('Conveyor failed to broadcast: ' . $e->getMessage());
+>     },
+>     report: false,
+> );
 
 ## Usage
 
