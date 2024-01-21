@@ -3,13 +3,10 @@
 namespace Kanata\LaravelBroadcaster;
 
 use App\Models\User;
-use Conveyor\Models\WsAssociation;
-use Conveyor\Persistence\Interfaces\GenericPersistenceInterface;
 use Conveyor\Persistence\Interfaces\UserAssocPersistenceInterface;
-use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster as BaseBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
-use Illuminate\Support\Facades\Cache;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Kanata\LaravelBroadcaster\Services\JwtToken;
 use Ramsey\Uuid\Uuid;
@@ -61,14 +58,14 @@ class ConveyorDriver extends BaseBroadcaster
     /**
      * @param string $token
      * @return void
-     * @throws Exception
+     * @throws AuthorizationException
      */
     public function validateConnection(string $token): void
     {
         $tokenInstance = Token::byToken($token)->first();
 
         if (null === $tokenInstance || null === $tokenInstance->user) {
-            throw new Exception('Unauthorized');
+            throw new AuthorizationException('Unauthorized');
         }
 
         $tokenInstance->consume();
