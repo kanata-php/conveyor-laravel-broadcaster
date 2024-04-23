@@ -3,7 +3,7 @@
 namespace Kanata\LaravelBroadcaster;
 
 use App\Models\User;
-use Conveyor\Persistence\Interfaces\UserAssocPersistenceInterface;
+use Conveyor\SubProtocols\Conveyor\Persistence\Interfaces\UserAssocPersistenceInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster as BaseBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
