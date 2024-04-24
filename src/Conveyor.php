@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Facades\Log;
 use Kanata\ConveyorServerClient\Client;
 use Exception;
+use Error;
 use WebSocket\TimeoutException;
 
 class Conveyor
@@ -26,17 +27,16 @@ class Conveyor
                         'protocol' => config('conveyor.protocol', 'ws'),
                         'host' => config('conveyor.uri', '127.0.0.1'),
                         'port' => config('conveyor.port', 8002),
-                        'query' => '?'.config('conveyor.query', ''),
+                        'query' => '?' . config('conveyor.query', ''),
                         'channel' => $channel->name,
                         'timeout' => 1,
-                        'onReadyCallback' => function(Client $currentClient) use ($payload) {
-                            $currentClient->send($payload['message']);
-                        },
+                        'onReadyCallback' => fn(Client $client)
+                            => $client->send($payload['message']),
                     ];
                     $client = new Client($options);
                     $client->connect();
                 },
-                rescue: function (Exception $e) {
+                rescue: function (Exception|Error $e) {
                     if ($e instanceof TimeoutException) {
                         return;
                     }

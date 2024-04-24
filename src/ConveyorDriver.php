@@ -7,6 +7,9 @@ use Conveyor\SubProtocols\Conveyor\Persistence\Interfaces\UserAssocPersistenceIn
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster as BaseBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Container\Container;
+use Illuminate\Support\Str;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Kanata\LaravelBroadcaster\Services\JwtToken;
 use Ramsey\Uuid\Uuid;
@@ -101,5 +104,16 @@ class ConveyorDriver extends BaseBroadcaster
             fd: $fd,
             userId: $user->id,
         );
+    }
+
+    public function getAssocUser(
+        int $fd,
+        ?UserAssocPersistenceInterface $assocPersistence,
+    ): ?User {
+        if (null === $assocPersistence) {
+            return null;
+        }
+
+        return User::find($assocPersistence->getAssoc(fd: $fd));
     }
 }
