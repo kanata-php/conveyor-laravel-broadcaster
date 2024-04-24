@@ -4,6 +4,7 @@ namespace Kanata\LaravelBroadcaster;
 
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
+use Kanata\LaravelBroadcaster\Commands\ConveyorToken;
 
 class ConveyorServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,12 @@ class ConveyorServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/conveyor.php' => config_path('conveyor.php'),
         ]);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ConveyorToken::class,
+            ]);
+        }
 
         Broadcast::extend('conveyor', function ($app) {
             return new ConveyorDriver(new Conveyor());
