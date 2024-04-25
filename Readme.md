@@ -189,6 +189,7 @@ $client->connect();
 > );
 > ```
 > Yeah, maybe I'll come up with a helper soon...
+> The thing is that, you'll see further in this documentation that you can broadcast a Laravel Event and achieve the same thing with less code, but this way here is faster.
 
 Example of usage in a view with authorization at this point:
 
