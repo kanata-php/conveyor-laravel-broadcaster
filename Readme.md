@@ -187,6 +187,8 @@ $client->connect();
 >     },
 >     report: false,
 > );
+> ```
+> Yeah, maybe I'll come up with a helper soon...
 
 Example of usage in a view with authorization at this point:
 
