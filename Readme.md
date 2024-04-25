@@ -1,11 +1,13 @@
 
 # Conveyor Laravel Broadcaster
 
-This is a Laravel Integration for [**Socket Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel.
+This is a Laravel Integration for [**Socket Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel. **This package needs** [**Jacked Server**](https://github.com/jacked-php/jacked-server).
 
-**Recommended**: If you want to run a WebSocket server using Laravel, you can use [**Jacked Server**](https://github.com/jacked-php/jacked-server), so your Laravel can serve itself, and, at the same port, it will serve the WebSocket server with Socket Conveyor out-of-the-box. You'll be able to customize it in the Laravel installation where you run it from.
+This package is an alternative for those who want to use Conveyor as a broadcasting driver. For that, you need to install Jacked Server or check there how to run your WebSocket server with Conveyor
 
 ## Installation
+
+> Start by installing [Jacked Server](https://github.com/jacked-php/jacked-server). 
 
 **Step 1**: Install the package via composer:
 
@@ -33,7 +35,13 @@ return [
 ];
 ```
 
-**Step 4**: Add the following to your `config/broadcasting.php` file:
+**Step 4**: If on Laravel 11, enable Laravel broadcasting:
+
+```shell
+php artisan install:broadcasting
+```
+
+**Step 5**: Add the following to your `config/broadcasting.php` file:
 
 ```php
 <?php
@@ -46,7 +54,38 @@ return [
 ];
 ```
 
-**Step 5**: Specify the configurations for the WebSocket server in the `.env` file:
+**Step 6**: Protect your channel with a "channel route" (a specific laravel detail). You do this by adding the following to your `routes/channels.php`:
+
+```php
+use App\Models\User;
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::channel('actions-channel', function (User $user) {
+    return true; // we are authorizing any user here
+});
+```
+
+**Step 7**: This package require an user to authenticate with. To quickly create a user, you can use tinker for that:
+
+```bash
+php artisan tinker
+```
+
+Within tinker, you can create a user:
+
+```php
+App\Models\User::factory()->create(['email' => 'user@jacked-server.com', 'password' => Hash::make('password')]);
+```
+
+**Step 8**: Generate a "system level" token:
+
+This package comes with a laravel command to generate a token for a user. This token won't expire, and it will only have the permissions of the user you are using to generate it. You can use it like this:
+
+```bash
+php artisan conveyor:token {your user id}
+```
+
+**Step 9**: Specify the configurations for the WebSocket server in the `.env` file:
 
 ```dotenv
 # ...
@@ -58,62 +97,43 @@ CONVEYOR_PROTOCOL=ws
 CONVEYOR_QUERY="token=123456"
 ```
 
-> Keep in the query a token with no use limits. You can create one with this:
+> **Alternative:** A programmatic way is to use Conveyor's JwtToken service:
+>
 > ```php
-> use Kanata\JWT\JwtToken;
-> 
+> use Kanata\LaravelBroadcaster\Services\JwtToken;
+>
+> /** @var \Kanata\LaravelBroadcaster\Models\Token $token */
 > $token = JwtToken::create(
 >     name: 'some-token',
->     userId: $user->id,
->     expire: null,
->     // no use limits
+>     userId: auth()->user()->id,
+>     expire: null, // an expiration date can be set here
+>     useLimit: 1, // how many times this token can be used
 > );
-> ```
+> ``` 
 
 ---
 
-At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server. To undertand how to broadcast, see [Broadcasting](https://laravel.com/docs/10.x/broadcasting).
-
-The following steps are optional, but they can be useful if you want to integrate with the Conveyor WebSocket server from other implementations/applications.
+> At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server to public channels. To undertand how to broadcast, see [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
 
 ---
 
-**(Extra) Step 6**: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
+**Step 6**: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
 
 ```bash
 npm install socket-conveyor-client
 ```
 
-> **Info:** If you want to integrate with the frontend, you can use the WebSocket from JavaScript, but if you want something more advanced, with out-of-the-box integration with the Conveyor's Sub-Protocol, you can use Conveyor JS Client. See [Socket Conveyor Client](https://www.npmjs.com/package/socket-conveyor-client) for more information.
+Add this to the bootstrap.js file of your Laravel app so the Conveyor client is available globally:
 
-Example of usage:
+```js
+import Conveyor from "socket-conveyor-client";
 
-```javascript
-import Conveyor from './node_modules/socket-conveyor-client/index.js';
-
-var connection = new Conveyor({
-    protocol: 'ws',
-    uri: '127.0.0.1',
-    port: 8000,
-    query: '?token=' + conveyorToken, // if needed
-    channel: 'my-channel',
-    reconnect: true,
-    onMessage: (e) => {
-        // your callback here
-    },
-    onReady: () => {
-        // your callback here
-    },
-    onReconnectCallback: async () => {
-        // here you renew your token
-        connection.setOption('query', '?token=' + myNewtoken);
-    },
-});
-
-connection.send('Hello World!');
+window.Conveyor = Conveyor;
 ```
 
-**(Extra) Step 7**: Install the Server Side [Conveyor Client](https://github.com/kanata-php/conveyor-server-client):
+Remember to run `npm install` and `npm run dev` or `npm run prod` to compile the assets.
+
+**Step 7**: Install the Server Side [Conveyor Client](https://github.com/kanata-php/conveyor-server-client):
 
 ```bash
 composer require kanata-php/conveyor-server-client
@@ -168,9 +188,80 @@ $client->connect();
 >     report: false,
 > );
 
-## Usage
+Example of usage in a view with authorization at this point:
 
-You can use the Conveyor driver as you would use any other driver in Laravel. See [Broadcasting](https://laravel.com/docs/8.x/broadcasting) for more information.
+```html
+<html>
+<head>
+    <title>WS Client</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body>
+
+<textarea id="msg"></textarea>
+<button id="btn-base">Base</button>
+<button id="btn-broadcast">Broadcast</button>
+<ul id="output"></ul>
+
+<script type="text/javascript">
+    // page elements
+    const msg = document.getElementById('msg')
+    const btnBase = document.getElementById('btn-base')
+    const btnBroadcast = document.getElementById('btn-broadcast')
+    const output = document.getElementById('output')
+
+    const connect = (token) => {
+        let conveyor = new window.Conveyor({
+            protocol: '{{ $protocol }}',
+            uri: '{{ $uri }}',
+            port: {{ $wsPort }},
+            channel: '{{ $channel }}',
+            query: '?token=' + token,
+            onMessage: (e) => output.innerHTML = e,
+            onReady: () => {
+                btnBase.addEventListener('click', () => conveyor.send(msg.value))
+                btnBroadcast.addEventListener('click', () => conveyor.send(msg.value, 'broadcast-action'))
+            },
+        });
+    };
+
+    const  getAuth = (callback) => {
+        fetch('/broadcasting/auth?channel_name={{ $channel }}', {
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => callback(data.auth))
+            .catch(error => console.error(error));
+    }
+
+    document.addEventListener("DOMContentLoaded", () => getAuth(connect));
+</script>
+</body>
+</html>
+```
+
+Then, add the route for this view at your `routes/web.php` file:
+
+```php
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+Route::get('/ws-client', function () {
+    Auth::loginUsingId(1); // here we authorize for the sake of the example.
+
+    $protocol = config('jacked-server.ssl-enabled') ? 'wss' : 'ws';
+    $port = config('jacked-server.ssl-enabled') ? config('jacked-server.ssl-port') : config('jacked-server.port');
+
+    return view('ws-client', [
+        'protocol' => $protocol,
+        'uri' => '127.0.0.1',
+        'wsPort' => $port,
+        'channel' => 'private-actions-channel',
+    ]);
+});
+```
 
 ### Example
 
@@ -182,17 +273,17 @@ Here you have an example of the Event class:
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 
-class OrderShipped implements ShouldBroadcast
+class TestEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public Order $order
+        public string $message
     ) {}
 
     public function broadcastOn(): Channel
     {
-        return new PrivateChannel('orders.'.$this->order->id);
+        return new PrivateChannel('actions-channel');
     }
 }
 ```
@@ -200,27 +291,22 @@ class OrderShipped implements ShouldBroadcast
 Then, you can dispatch the event (as you would do with any other Laravel Broadcasting driver) using the `event` helper function or the `Event` facade:
 
 ```php
-event(new OrderShipped($order));
+event(new TestEvent('My test message'));
 // or
-Event::dispatch(new OrderShipped($order));
+Event::dispatch(new TestEvent('My test message'));
 ```
 
 ### Authorizing Channels
 
-To authorize users to access channels, you can use the `Broadcast::channel` method. See [Authorizing Channels](https://laravel.com/docs/8.x/broadcasting#authorizing-channels) for more information:
+To authorize users to access channels, you can use the `Broadcast::channel` method. See [Authorizing Channels](https://laravel.com/docs/11.x/broadcasting#authorizing-channels) for more information:
 
 ```php
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\User;
-use App\Models\Order;
 
-Broadcast::channel('channel-x', function (User $user): bool {
-    return $user->can('interact-with-channel-x', User::class);
-});
-
-Broadcast::channel('orders.{orderId}', function (User $user, int $orderId) {
-    return $user->id === Order::findOrNew($orderId)->user_id;
+Broadcast::channel('actions-channel', function (User $user) {
+    return true; // we are authorizing any user here
 });
 ``` 
