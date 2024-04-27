@@ -2,13 +2,13 @@
 
 namespace Kanata\LaravelBroadcaster;
 
+use Conveyor\SubProtocols\Conveyor\Actions\BroadcastAction;
+use Conveyor\SubProtocols\Conveyor\Actions\ChannelConnectAction;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Facades\Log;
-use Kanata\ConveyorServerClient\Client;
 use Exception;
-use Error;
-use WebSocket\TimeoutException;
+use WebSocket\Client as WsClient;
 
 class Conveyor
 {
@@ -18,32 +18,46 @@ class Conveyor
      * @param array $payload
      * @return void
      */
-    public function broadcast(array $channels, $event, array $payload = [])
+    public function broadcast(array $channels, $event, array $payload = []): void
     {
-        foreach ($channels as $channel) {
-            rescue(
-                callback: function () use ($channel, $payload) {
-                    $options = [
-                        'protocol' => config('conveyor.protocol', 'ws'),
-                        'host' => config('conveyor.uri', '127.0.0.1'),
-                        'port' => config('conveyor.port', 8002),
-                        'query' => '?' . config('conveyor.query', ''),
-                        'channel' => $channel->name,
-                        'timeout' => 1,
-                        'onReadyCallback' => fn(Client $client)
-                            => $client->send($payload['message']),
-                    ];
-                    $client = new Client($options);
-                    $client->connect();
-                },
-                rescue: function (Exception|Error $e) {
-                    if ($e instanceof TimeoutException) {
-                        return;
-                    }
-                    Log::info('Conveyor failed to broadcast: ' . $e->getMessage());
-                },
-                report: false,
-            );
+        try {
+            foreach ($channels as $channel) {
+                $this->sendOneOff($channel, $payload['message']);
+            }
+        } catch (Exception $e) {
+            Log::error('Conveyor: Failed to broadcast to channel: ' . $channel, ['exception' => $e]);
         }
+    }
+
+    protected function sendOneOff(string $channel, string $message)
+    {
+        $protocol = config('conveyor.protocol', 'ws');
+        $host = config('conveyor.uri', '127.0.0.1');
+        $port = config('conveyor.port', 8002);
+        $query = '?' . config('conveyor.query', '');
+        $uri = "{$protocol}://{$host}:{$port}/{$query}";
+
+        $client = new WsClient(
+            uri: $uri,
+            options: [
+                'timeout' => 3,
+            ],
+        );
+
+        // connect to channel
+        $channelConnectMessage = json_encode([
+            'action' => ChannelConnectAction::NAME,
+            'channel' => $channel,
+        ]);
+        $client->send($channelConnectMessage);
+
+        // broadcast
+        $client->send(json_encode([
+            'action' => BroadcastAction::NAME,
+            'data' => $message,
+        ]));
+        $client->receive();
+
+        $client->close();
     }
 }
