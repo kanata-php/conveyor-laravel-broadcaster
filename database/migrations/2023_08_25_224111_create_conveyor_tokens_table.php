@@ -11,18 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('conveyor_tokens', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 40);
-            $table->string('token', 500);
-            $table->dateTime('expire_at')->nullable()->comment('Expire date for token. Null when doesnt expire.');
-            $table->string('aud', 100)->nullable()->comment('Audience: domain allowed to use token. Null when not restricted.');
-            $table->string('aud_protocol', 10)->nullable();
-            $table->integer('allowed_uses')->nullable()->comment('Number of times this token is allowed to be used.');
-            $table->integer('uses')->nullable()->comment('Number of times this token as been used.');
-            $table->foreignId('user_id');
-            $table->timestamps();
-        });
+        Schema::connection(config('conveyor.database-driver'))
+            ->create('conveyor_tokens', function (Blueprint $table) {
+                $table->id();
+                $table->string('name', 40);
+                $table->string('token', 500);
+                $table->dateTime('expire_at')->nullable()->comment('Expire date for token. Null when doesnt expire.');
+                $table->string('aud', 100)->nullable()->comment('Audience: domain allowed to use token. Null when not restricted.');
+                $table->string('aud_protocol', 10)->nullable();
+                $table->integer('allowed_uses')->nullable()->comment('Number of times this token is allowed to be used.');
+                $table->integer('uses')->nullable()->comment('Number of times this token as been used.');
+                $table->foreignId('user_id');
+                $table->timestamps();
+            });
     }
 
     /**
@@ -30,6 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('conveyor_tokens');
+        Schema::connection(config('conveyor.database-driver'))
+            ->dropIfExists('conveyor_tokens');
     }
 };
