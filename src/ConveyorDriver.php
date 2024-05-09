@@ -7,9 +7,6 @@ use Conveyor\SubProtocols\Conveyor\Persistence\Interfaces\UserAssocPersistenceIn
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster as BaseBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Container\Container;
-use Illuminate\Support\Str;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Kanata\LaravelBroadcaster\Services\JwtToken;
 use Ramsey\Uuid\Uuid;
@@ -65,7 +62,9 @@ class ConveyorDriver extends BaseBroadcaster
      */
     public function validateConnection(string $token): void
     {
-        $tokenInstance = Token::byToken($token)->first();
+        $tokenModel = new Token;
+        $tokenModel->setConnection(config('conveyor.database-driver'));
+        $tokenInstance = $tokenModel->byToken($token)->first();
 
         if (null === $tokenInstance || null === $tokenInstance->user) {
             throw new AuthorizationException('Unauthorized');

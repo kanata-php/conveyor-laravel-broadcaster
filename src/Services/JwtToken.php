@@ -6,6 +6,7 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -44,7 +45,9 @@ class JwtToken
         $token = $authorization[1] ?? null;
 
         try {
-            $tokenRecord = Token::where('token', $token)->first()->consume();
+            $tokenModel = new Token;
+            $tokenModel->setConnection(config('conveyor.database-driver'));
+            $tokenRecord = $tokenModel->where('token', $token)->first()->consume();
         } catch (Exception $e) {
             $app->getContainer()->get('logger')->error('Invalid token: ' . $e->getMessage());
             return null;
@@ -88,6 +91,8 @@ class JwtToken
             $tokenData['use_limit'] = $useLimit;
         }
 
-        return Token::create($tokenData);
+        $tokenModel = new Token;
+        $tokenModel->setConnection(config('conveyor.database-driver'));
+        return $tokenModel->create($tokenData);
     }
 }

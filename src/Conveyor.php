@@ -4,7 +4,7 @@ namespace Kanata\LaravelBroadcaster;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class Conveyor
 {
@@ -16,16 +16,11 @@ class Conveyor
      */
     public function broadcast(array $channels, $event, array $payload = []): void
     {
-        Cache::lock('conveyor-messages', 2)
-            ->block(6, function () use ($channels, $event, $payload) {
-                foreach ($channels as $channel) {
-                    $messages = Cache::pull('conveyor-messages', []);
-                    array_push($messages, [
-                        'channel' => $channel->name,
-                        'message' => $payload['message'],
-                    ]);
-                    Cache::set('conveyor-messages', $messages, 10);
-                }
-            });
+        foreach ($channels as $channel) {
+            Http::post(config('app.url') . '/conveyor/message', [
+                'channel' => $channel->name,
+                'message' => json_encode($payload),
+            ]);
+        }
     }
 }

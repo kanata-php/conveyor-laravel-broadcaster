@@ -10,8 +10,6 @@ class Token extends Model
 {
     const TABLE_NAME = 'conveyor_tokens';
 
-    protected $connection = 'conveyor';
-
     protected $table = self::TABLE_NAME;
 
     protected array $defaults = [];
