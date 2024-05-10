@@ -149,6 +149,8 @@ Remember to run `npm install` and `npm run dev` or `npm run prod` to compile the
 > event(new App\Events\TestEvent( message: 'my message', channel: 'my-channel'));
 > ```
 
+> **Important**: notice that we are using `ShouldBroadcastNow` instead of `ShouldBroadcast`. Conveyor doesn't need queueing and is much faster this way. If you want, you can still use queues.
+
 
 Example of usage in a view with authorization at this point:
 
