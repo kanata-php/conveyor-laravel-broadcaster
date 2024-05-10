@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::connection(config('conveyor.database-driver'))->hasTable('conveyor_tokens')) {
+            return;
+        }
+
         Schema::connection(config('conveyor.database-driver'))
             ->create('conveyor_tokens', function (Blueprint $table) {
                 $table->id();
