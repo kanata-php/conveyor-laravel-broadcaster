@@ -77,15 +77,7 @@ Within tinker, you can create a user:
 App\Models\User::factory()->create(['email' => 'user@jacked-server.com', 'password' => Hash::make('password')]);
 ```
 
-**Step 8**: Generate a "system level" token:
-
-This package comes with a laravel command to generate a token for a user. This token won't expire, and it will only have the permissions of the user you are using to generate it. You can use it like this:
-
-```bash
-php artisan conveyor:token {your user id}
-```
-
-**Step 9**: Specify the configurations for the WebSocket server in the `.env` file:
+**Step 8**: Specify the configurations for the WebSocket server in the `.env` file:
 
 ```dotenv
 # ...
@@ -109,11 +101,11 @@ BROADCAST_CONNECTION=conveyor
 
 ---
 
-> At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server to public channels. To undertand how to broadcast, see [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
+> At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server to public channels. To understand how to broadcast with Laravel, visit [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
 
 ---
 
-**Step 6**: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
+**Step 9**: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
 
 ```bash
 npm install socket-conveyor-client
@@ -129,7 +121,7 @@ window.Conveyor = Conveyor;
 
 Remember to run `npm install` and `npm run dev` or `npm run prod` to compile the assets.
 
-**Step 7**: Install the Server Side [Conveyor Client](https://github.com/kanata-php/conveyor-server-client):
+**Step 10**: Install the Server Side [Conveyor Client](https://github.com/kanata-php/conveyor-server-client):
 
 ```bash
 composer require kanata-php/conveyor-server-client
