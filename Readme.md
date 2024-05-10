@@ -79,29 +79,21 @@ App\Models\User::factory()->create(['email' => 'user@jacked-server.com', 'passwo
 
 **Step 8**: Specify the configurations for the WebSocket server in the `.env` file:
 
+> Important: SQLite won't work well due to its lock mechanism and how concurrency happens with this service. It is recommended to use MySQL, Postgres, or a more robust database.
+
 ```dotenv
 # ...
 BROADCAST_CONNECTION=conveyor
 # ...
+# MySQL of Postgres are better alternatives that SQLite
+CONVEYOR_DATABASE=pgsql
+JACKED_SERVER_WEBSOCKET_ENABLED=true
+# ...
 ```
-
-> **Alternative:** A programmatic way is to use Conveyor's JwtToken service:
->
-> ```php
-> use Kanata\LaravelBroadcaster\Services\JwtToken;
->
-> /** @var \Kanata\LaravelBroadcaster\Models\Token $token */
-> $token = JwtToken::create(
->     name: 'some-token',
->     userId: auth()->user()->id,
->     expire: null, // an expiration date can be set here
->     useLimit: 1, // how many times this token can be used
-> );
-> ``` 
 
 ---
 
-> At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server to public channels. To understand how to broadcast with Laravel, visit [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
+> At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server. To understand how to broadcast with Laravel, visit [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
 
 ---
 
@@ -110,6 +102,8 @@ BROADCAST_CONNECTION=conveyor
 ```bash
 npm install socket-conveyor-client
 ```
+
+> Important: Don't forget to run `npm run build`!
 
 Add this to the bootstrap.js file of your Laravel app so the Conveyor client is available globally:
 
@@ -121,63 +115,40 @@ window.Conveyor = Conveyor;
 
 Remember to run `npm install` and `npm run dev` or `npm run prod` to compile the assets.
 
-**Step 10**: Install the Server Side [Conveyor Client](https://github.com/kanata-php/conveyor-server-client):
-
-```bash
-composer require kanata-php/conveyor-server-client
-```
-
-Example of usage:
-
-```php
-use Kanata\ConveyorServerClient\Client;
-use WebSocket\Client as WsClient;
-
-$options = [
-    'protocol' => 'ws',
-    'uri' => '127.0.0.1',
-    'port' => 8000,
-    'onMessageCallback' => function (WsClient $currentClient, string $message) {
-        echo 'Message received: ' . $message . PHP_EOL;
-        $currentClient->send('Hello World!');
-    },
-    'onReadyCallback' => fn() => {}, // your callback here
-];
-
-$client = new Client($options);
-$client->connect();
-```
-
-> **Info:** If you want to send one-off messages to the Conveyor WebSocket server, you can do like this:
+> **Info:** If you want to send one-off messages to the Conveyor WebSocket server, you can just dispatch an event like follows:
 > ```php
-> // this laravel helper (rescue) is a pretty alternative to try/catch
-> rescue(
->     callback: function () use ($channel, $payload) {
->         $options = [
->             'protocol' => config('conveyor.protocol', 'ws'),
->             'host' => config('conveyor.uri', '127.0.0.1'),
->             'port' => config('conveyor.port', 8002),
->             'query' => '?'.config('conveyor.query', ''),
->             'channel' => $channel->name,
->             'timeout' => 1,
->             'onReadyCallback' => function(Client $currentClient) use ($payload) {
->                 $currentClient->send($payload['message']);
->             },
+> <?php
+> 
+> namespace App\Events;
+> 
+> use Illuminate\Broadcasting\InteractsWithBroadcasting;
+> use Illuminate\Broadcasting\PrivateChannel;
+> use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+> 
+> class TestEvent implements ShouldBroadcastNow
+> {
+>     use InteractsWithBroadcasting;
+> 
+>     public function __construct(
+>         public string $message,
+>         public string $channel,
+>     ) {
+>         $this->broadcastVia('conveyor');
+>     }
+> 
+>     public function broadcastOn(): array
+>     {
+>         return [
+>             new PrivateChannel($this->channel),
 >         ];
->         $client = new Client($options);
->         $client->connect();
->     },
->     rescue: function (Exception $e) {
->         if ($e instanceof TimeoutException) {
->             return;
->         }
->         Log::info('Conveyor failed to broadcast: ' . $e->getMessage());
->     },
->     report: false,
-> );
+>     }
+> }
 > ```
-> Yeah, maybe I'll come up with a helper soon...
-> The thing is that, you'll see further in this documentation that you can broadcast a Laravel Event and achieve the same thing with less code, but this way here is faster.
+>
+> ```php
+> event(new App\Events\TestEvent( message: 'my message', channel: 'my-channel'));
+> ```
+
 
 Example of usage in a view with authorization at this point:
 
@@ -249,55 +220,7 @@ Route::get('/ws-client', function () {
         'protocol' => $protocol,
         'uri' => '127.0.0.1',
         'wsPort' => $port,
-        'channel' => 'private-actions-channel',
+        'channel' => 'private-my-channel',
     ]);
 });
 ```
-
-### Example
-
-Here you can see how to Broadcast an event to a channel:
-
-Here you have an example of the Event class:
-
-```php
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PrivateChannel;
-
-class TestEvent implements ShouldBroadcast
-{
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public function __construct(
-        public string $message
-    ) {}
-
-    public function broadcastOn(): Channel
-    {
-        return new PrivateChannel('actions-channel');
-    }
-}
-```
-
-Then, you can dispatch the event (as you would do with any other Laravel Broadcasting driver) using the `event` helper function or the `Event` facade:
-
-```php
-event(new TestEvent('My test message'));
-// or
-Event::dispatch(new TestEvent('My test message'));
-```
-
-### Authorizing Channels
-
-To authorize users to access channels, you can use the `Broadcast::channel` method. See [Authorizing Channels](https://laravel.com/docs/11.x/broadcasting#authorizing-channels) for more information:
-
-```php
-<?php
-
-use Illuminate\Support\Facades\Broadcast;
-use App\Models\User;
-
-Broadcast::channel('actions-channel', function (User $user) {
-    return true; // we are authorizing any user here
-});
-``` 
