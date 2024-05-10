@@ -61,7 +61,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('actions-channel', function (User $user) {
-    return true; // we are authorizing any user here
+    return true; // we are authorizing any user here - update according to your needs!
 });
 ```
 
@@ -89,12 +89,8 @@ php artisan conveyor:token {your user id}
 
 ```dotenv
 # ...
-BROADCAST_DRIVER=conveyor
+BROADCAST_CONNECTION=conveyor
 # ...
-CONVEYOR_HOST=127.0.0.1
-CONVEYOR_PORT=8080
-CONVEYOR_PROTOCOL=ws
-CONVEYOR_QUERY="token=123456"
 ```
 
 > **Alternative:** A programmatic way is to use Conveyor's JwtToken service:
