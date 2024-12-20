@@ -1,27 +1,42 @@
 
 # Conveyor Laravel Broadcaster
 
-This is a Laravel Integration for [**Socket Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel. **This package needs** [**Jacked Server**](https://github.com/jacked-php/jacked-server).
+This is a Laravel Integration for [**Socket Conveyor**](http://socketconveyor.com). It allows you to use the Conveyor WebSocket server as a broadcasting driver for Laravel. This package doesn't need [**Jacked Server**](https://github.com/jacked-php/jacked-server), but just know that that web server is great!
 
-This package is an alternative for those who want to use Conveyor as a broadcasting driver. For that, you need to install Jacked Server or check there how to run your WebSocket server with Conveyor
+This package allows the usage of Conveyor as a broadcasting driver in Laravel.
 
-## Installation
+> To understand how to broadcast with Laravel, visit [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
 
-> Start by installing [Jacked Server](https://github.com/jacked-php/jacked-server). 
+## Quick Start
 
-**Step 1**: Install the package via composer:
+**Table of Contents**
+
+- [Step 1: Install the package via composer](#step-1-install-the-package-via-composer)
+- [Step 2: Publish the configuration](#step-2-publish-the-configuration)
+- [Step 3: Add Service Provider](#step-3-add-service-provider)
+- [Step 4: Enable Laravel broadcasting](#step-4-enable-laravel-broadcasting)
+- [Step 5: Add broadcasting config](#step-5-add-broadcasting-config)
+- [Step 6: Protect your channels](#step-6-protect-your-channels)
+- [Step 7: Create a user for authorization - if needed](#step-7-create-a-user-for-authorization---if-needed)
+- [Step 8: Migrate the database](#step-8-migrate-the-database)
+- [Step 9: Install the Conveyor JS Client](#step-9-install-the-conveyor-js-client)
+- [Extra: Simple Conveyor Server for this example](#extra-simple-conveyor-server-for-this-example)
+
+#### Step 1: Install the package via composer
 
 ```bash
 composer require kanata-php/conveyor-laravel-broadcaster
 ```
 
-**Step 2**: Publish the configuration:
+#### Step 2: Publish the configuration
 
 ```bash
 php artisan vendor:publish --provider="Kanata\LaravelBroadcaster\ConveyorServiceProvider"
 ```
 
-**Step 3**: Add Service Provider to the `config/app.php` file:
+#### Step 3: Add Service Provider
+
+Laravel 10 backwards:
 
 ```php
 <?php
@@ -35,13 +50,28 @@ return [
 ];
 ```
 
-**Step 4**: If on Laravel 11, enable Laravel broadcasting:
+Laravel 11 onwards:
+
+```php
+<?php
+
+return [
+    // ...
+    Kanata\LaravelBroadcaster\ConveyorServiceProvider::class,
+];
+```
+
+#### Step 4: Enable Laravel broadcasting
+
+> This is for Laravel 11 and forward, if in any other version just skip this step!
 
 ```shell
 php artisan install:broadcasting
 ```
 
-**Step 5**: Add the following to your `config/broadcasting.php` file:
+#### Step 5: Add broadcasting config
+
+Add the following to your `config/broadcasting.php` file:
 
 ```php
 <?php
@@ -50,11 +80,14 @@ return [
     // ...
     'conveyor' => [
         'driver' => 'conveyor',
+        'protocol' => env('CONVEYOR_PROTOCOL', 'ws'),
+        'host' => env('CONVEYOR_URI', 'localhost'),
+        'port' => env('CONVEYOR_PORT', 8181),
     ],
 ];
 ```
 
-**Step 6**: Protect your channel with a "channel route" (a specific laravel detail). You do this by adding the following to your `routes/channels.php`:
+#### Step 6: Protect your channels
 
 ```php
 use App\Models\User;
@@ -65,7 +98,7 @@ Broadcast::channel('actions-channel', function (User $user) {
 });
 ```
 
-**Step 7**: This package require an user to authenticate with. To quickly create a user, you can use tinker for that:
+#### Step 7: Create a user for authorization - if needed
 
 ```bash
 php artisan tinker
@@ -77,27 +110,28 @@ Within tinker, you can create a user:
 App\Models\User::factory()->create(['email' => 'user@jacked-server.com', 'password' => Hash::make('password')]);
 ```
 
-**Step 8**: Specify the configurations for the WebSocket server in the `.env` file:
+#### Step 8: Migrate the database
 
-> Important: SQLite won't work well due to its lock mechanism and how concurrency happens with this service. It is recommended to use MySQL, Postgres, or a more robust database.
+Set the configurations for the WebSocket server in the `.env` file:
 
 ```dotenv
 # ...
 BROADCAST_CONNECTION=conveyor
 # ...
-# MySQL of Postgres are better alternatives that SQLite
 CONVEYOR_DATABASE=pgsql
 JACKED_SERVER_WEBSOCKET_ENABLED=true
 # ...
 ```
 
----
+> `CONVEYOR_DATABASE` is optional and defaults to mysql.
 
-> At this point you can broadcast from your Laravel instance to the Conveyor WebSocket server. To understand how to broadcast with Laravel, visit [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
+Then run migrations:
 
----
+```bash
+php artisan migrate
+```
 
-**Step 9**: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
+#### Step 9: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
 
 ```bash
 npm install socket-conveyor-client
@@ -200,7 +234,10 @@ Example of usage in a view with authorization at this point:
             .catch(error => console.error(error));
     }
 
+    // for authorization:
     document.addEventListener("DOMContentLoaded", () => getAuth(connect));
+    // for simple public connection:
+    // document.addEventListener("DOMContentLoaded", () => connect(''));
 </script>
 </body>
 </html>
@@ -215,14 +252,38 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/ws-client', function () {
     Auth::loginUsingId(1); // here we authorize for the sake of the example.
 
-    $protocol = config('jacked-server.ssl-enabled') ? 'wss' : 'ws';
-    $port = config('jacked-server.ssl-enabled') ? config('jacked-server.ssl-port') : config('jacked-server.port');
-
     return view('ws-client', [
-        'protocol' => $protocol,
-        'uri' => '127.0.0.1',
-        'wsPort' => $port,
+        'protocol' => config('broadcasting.connections.conveyor.protocol'),
+        'uri' => config('broadcasting.connections.conveyor.host'),
+        'wsPort' => config('broadcasting.connections.conveyor.port'),
         'channel' => 'private-my-channel',
     ]);
 });
 ```
+
+#### Extra: Simple Conveyor Server for this example
+
+You can use this simple server to test your broadcasting (and in production...):
+
+```php
+<?php
+// file: server.php
+
+include __DIR__ . '/vendor/autoload.php';
+
+use Conveyor\ConveyorServer;
+use Conveyor\Events\MessageReceivedEvent;
+use Conveyor\Events\PreServerStartEvent;
+
+(new ConveyorServer())
+    // if you want to see messages in the console 
+    ->eventListeners([
+        Conveyor\Constants::EVENT_MESSAGE_RECEIVED => function (MessageReceivedEvent $event) {
+            var_dump($event->data);
+        },
+    ])
+    ->port(8181)
+    ->start();
+```
+
+Remember to install conveyor with `composer require kanata-php/conveyor` and run the server with `php server.php`.

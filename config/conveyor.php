@@ -24,5 +24,5 @@ return [
     /**
      * @var string
      */
-    'database-driver' => env('CONVEYOR_DATABASE', 'conveyor'),
+    'database-driver' => env('CONVEYOR_DATABASE', 'mysql'),
 ];
