@@ -28,4 +28,21 @@ class Conveyor
             ]);
         }
     }
+
+    /**
+     * It retrieves a single use token for the private channel.
+     */
+    public static function getToken(?string $channel = null): string
+    {
+        $conveyorUrl = (config('conveyor.protocol') === 'ws' ? 'http' : 'https') . '://'
+            . config('conveyor.uri') . ':'
+            . config('conveyor.port') . '/conveyor/auth'
+            . (config('conveyor.query') ? '?' . config('conveyor.query') : '');
+
+        $body = $channel === null ? [] : [
+            'channel' => $channel,
+        ];
+
+        return Http::post($conveyorUrl, $body)->json('auth', '');
+    }
 }
