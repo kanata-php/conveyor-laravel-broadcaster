@@ -96,7 +96,7 @@ BROADCAST_CONNECTION=conveyor
 CONVEYOR_URI=127.0.0.1
 CONVEYOR_PORT=8181
 CONVEYOR_DATABASE=pgsql
-CONVEYOR_QUERY="token=my-token"
+CONVEYOR_QUERY="token=my-secure-conveyor-token"
 # ...
 ```
 
