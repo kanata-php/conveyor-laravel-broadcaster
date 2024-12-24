@@ -183,36 +183,22 @@ Example of usage in a view with authorization at this point:
     const btnBroadcast = document.getElementById('btn-broadcast')
     const output = document.getElementById('output')
 
-    const connect = (token) => {
-        let conveyor = new window.Conveyor({
+    const connect = () => {
+        window.conveyor = new window.Conveyor({
             protocol: '{{ $protocol }}',
             uri: '{{ $uri }}',
             port: {{ $wsPort }},
             channel: '{{ $channel }}',
-            query: '?token=' + token,
+            token: '{{ \Kanata\LaravelBroadcaster\Conveyor::getToken($channel) }}',
             onMessage: (e) => output.innerHTML = e,
             onReady: () => {
-                btnBase.addEventListener('click', () => conveyor.send(msg.value))
-                btnBroadcast.addEventListener('click', () => conveyor.send(msg.value, 'broadcast-action'))
+                btnBase.addEventListener('click', () => window.conveyor.send(msg.value))
+                btnBroadcast.addEventListener('click', () => window.conveyor.send(msg.value, 'broadcast-action'))
             },
         });
     };
 
-    const  getAuth = (callback) => {
-        fetch('/broadcasting/auth?channel_name={{ $channel }}', {
-            headers: {
-                'Accept': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => callback(data.auth))
-            .catch(error => console.error(error));
-    }
-
-    // for authorization:
-    document.addEventListener("DOMContentLoaded", () => getAuth(connect));
-    // for simple public connection:
-    // document.addEventListener("DOMContentLoaded", () => connect(''));
+    document.addEventListener("DOMContentLoaded", () => connect());
 </script>
 </body>
 </html>
