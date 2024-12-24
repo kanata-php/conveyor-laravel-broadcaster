@@ -16,10 +16,8 @@ This package allows the usage of Conveyor as a broadcasting driver in Laravel.
 - [Step 3: Add Service Provider](#step-3-add-service-provider)
 - [Step 4: Enable Laravel broadcasting](#step-4-enable-laravel-broadcasting)
 - [Step 5: Add broadcasting config](#step-5-add-broadcasting-config)
-- [Step 6: Protect your channels](#step-6-protect-your-channels)
-- [Step 7: Create a user for authorization - if needed](#step-7-create-a-user-for-authorization---if-needed)
-- [Step 8: Migrate the database](#step-8-migrate-the-database)
-- [Step 9: Install the Conveyor JS Client](#step-9-install-the-conveyor-js-client)
+- [Step 6: Migrate the database](#step-6-migrate-the-database)
+- [Step 7: Install the Conveyor JS Client](#step-7-install-the-conveyor-js-client)
 - [Extra: Simple Conveyor Server for this example](#extra-simple-conveyor-server-for-this-example)
 
 #### Step 1: Install the package via composer
@@ -87,30 +85,7 @@ return [
 ];
 ```
 
-#### Step 6: Protect your channels
-
-```php
-use App\Models\User;
-use Illuminate\Support\Facades\Broadcast;
-
-Broadcast::channel('actions-channel', function (User $user) {
-    return true; // we are authorizing any user here - update according to your needs!
-});
-```
-
-#### Step 7: Create a user for authorization - if needed
-
-```bash
-php artisan tinker
-```
-
-Within tinker, you can create a user:
-
-```php
-App\Models\User::factory()->create(['email' => 'user@jacked-server.com', 'password' => Hash::make('password')]);
-```
-
-#### Step 8: Migrate the database
+#### Step 6: Migrate the database
 
 Set the configurations for the WebSocket server in the `.env` file:
 
@@ -131,7 +106,7 @@ Then run migrations:
 php artisan migrate
 ```
 
-#### Step 9: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
+#### Step 7: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
 
 ```bash
 npm install socket-conveyor-client
