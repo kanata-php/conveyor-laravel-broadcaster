@@ -93,12 +93,15 @@ Set the configurations for the WebSocket server in the `.env` file:
 # ...
 BROADCAST_CONNECTION=conveyor
 # ...
+CONVEYOR_URI=127.0.0.1
+CONVEYOR_PORT=8181
 CONVEYOR_DATABASE=pgsql
-JACKED_SERVER_WEBSOCKET_ENABLED=true
+CONVEYOR_QUERY="token=my-token"
 # ...
 ```
 
 > `CONVEYOR_DATABASE` is optional and defaults to mysql.
+> > `CONVEYOR_QUERY` is the url query where we add the token you set to protect your WebSocket server.
 
 Then run migrations:
 
