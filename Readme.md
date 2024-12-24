@@ -242,6 +242,7 @@ use Conveyor\Events\PreServerStartEvent;
 (new ConveyorServer())
     // if you want to see messages in the console 
     ->eventListeners([
+        Constants::WEBSOCKET_SERVER_TOKEN => 'my-secure-conveyor-token',
         Conveyor\Constants::EVENT_MESSAGE_RECEIVED => function (MessageReceivedEvent $event) {
             var_dump($event->data);
         },
