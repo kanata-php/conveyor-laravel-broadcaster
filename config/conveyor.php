@@ -20,9 +20,4 @@ return [
      * @var string e.g.: key=value
      */
     'query' => env('CONVEYOR_QUERY', ''),
-
-    /**
-     * @var string
-     */
-    'database-driver' => env('CONVEYOR_DATABASE', 'mysql'),
 ];

@@ -34,6 +34,10 @@ class Conveyor
      */
     public static function getToken(?string $channel = null): string
     {
+        if (empty((config('conveyor.query')))) {
+            return '';
+        }
+
         $conveyorUrl = (config('conveyor.protocol') === 'ws' ? 'http' : 'https') . '://'
             . config('conveyor.uri') . ':'
             . config('conveyor.port') . '/conveyor/auth'
