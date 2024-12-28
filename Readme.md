@@ -64,7 +64,7 @@ return [
 > This is for Laravel 11 and forward, if in any other version just skip this step!
 
 ```shell
-php artisan install:broadcasting
+php artisan install:broadcasting --without-reverb
 ```
 
 #### Step 5: Add broadcasting config
