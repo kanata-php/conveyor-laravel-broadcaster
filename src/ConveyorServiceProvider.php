@@ -16,8 +16,6 @@ class ConveyorServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadDatabase();
-
         $this->publishes([
             __DIR__ . '/../config/conveyor.php' => config_path('conveyor.php'),
         ]);
@@ -31,17 +29,5 @@ class ConveyorServiceProvider extends ServiceProvider
         Broadcast::extend('conveyor', function ($app) {
             return new ConveyorDriver(new Conveyor());
         });
-    }
-
-    private function loadDatabase(): void
-    {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
-        Config::set('database.connections.conveyor', array_merge(
-            Config::get('database.connections.sqlite'),
-            [
-                'database' => env('DB_DATABASE', database_path('conveyor.sqlite')),
-            ]
-        ));
     }
 }
