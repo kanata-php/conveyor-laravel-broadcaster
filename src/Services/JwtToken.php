@@ -6,7 +6,6 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Config;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -28,32 +27,34 @@ class JwtToken
 
     public static function getToken(Request $request): ?Token
     {
-        global $app;
-
         if (!$request->hasHeader('Authorization')) {
             return null;
         }
 
-        $authorization = $request->getHeader('Authorization');
-        $authorization = current($authorization);
-        $authorization = explode(' ', $authorization);
-
-        if (isset($authorization[0]) || $authorization[0] !== 'Bearer') {
+        $headerValue = current($request->getHeader('Authorization'));
+        if (!is_string($headerValue)) {
             return null;
         }
 
-        $token = $authorization[1] ?? null;
+        $authorization = explode(' ', $headerValue);
+        if (count($authorization) !== 2 || $authorization[0] !== 'Bearer') {
+            return null;
+        }
+
+        $token = $authorization[1];
 
         try {
-            $tokenModel = new Token;
+            $tokenModel = new Token();
             $tokenModel->setConnection(config('conveyor.database-driver'));
-            $tokenRecord = $tokenModel->where('token', $token)->first()->consume();
+            $record = $tokenModel->where('token', $token)->first();
+            if (null === $record) {
+                return null;
+            }
+            return $record->consume();
         } catch (Exception $e) {
-            $app->getContainer()->get('logger')->error('Invalid token: ' . $e->getMessage());
+            logger()->error('Invalid token: ' . $e->getMessage());
             return null;
         }
-
-        return $tokenRecord;
     }
 
     /**
@@ -91,7 +92,7 @@ class JwtToken
             $tokenData['use_limit'] = $useLimit;
         }
 
-        $tokenModel = new Token;
+        $tokenModel = new Token();
         $tokenModel->setConnection(config('conveyor.database-driver'));
         return $tokenModel->create($tokenData);
     }

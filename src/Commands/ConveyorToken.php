@@ -2,10 +2,11 @@
 
 namespace Kanata\LaravelBroadcaster\Commands;
 
-use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as DefaultUser;
 use Kanata\LaravelBroadcaster\Services\JwtToken;
-use Kanata\LaravelBroadcaster\Models\Token;
 
 class ConveyorToken extends Command
 {
@@ -26,25 +27,29 @@ class ConveyorToken extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
-        $user = User::find($this->argument('user'));
+        /** @var class-string<Authenticatable&Model> $model */
+        $model = config('auth.providers.users.model', DefaultUser::class);
+
+        $user = $model::query()->whereKey($this->argument('user'))->first();
         if (null === $user) {
             $this->error('User not found!');
-            return;
+            return self::FAILURE;
         }
 
-        $name = uniqid() . '-system-token-' . $user->getKey();
+        $name = uniqid('', true) . '-system-token-' . $user->getKey();
 
-        /** @var Token $token */
         $token = JwtToken::create(
             name: $name,
-            userId: $user->getKey(),
+            userId: (int) $user->getKey(),
             expire: null,
         );
 
         $this->line('Token generated successfully!');
         $this->info('Token Name: ' . $name);
         $this->info('Token: ' . $token->token);
+
+        return self::SUCCESS;
     }
 }

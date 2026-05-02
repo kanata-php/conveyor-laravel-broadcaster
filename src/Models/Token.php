@@ -2,18 +2,31 @@
 
 namespace Kanata\LaravelBroadcaster\Models;
 
-use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as DefaultUser;
 
+/**
+ * @property string $token
+ * @property int|null $uses
+ * @property int|null $use_limit
+ * @property int $user_id
+ * @property string|null $expire_at
+ *
+ * @method static self create(array<string, mixed> $attributes = [])
+ */
 class Token extends Model
 {
-    const TABLE_NAME = 'conveyor_tokens';
+    public const TABLE_NAME = 'conveyor_tokens';
 
     protected $table = self::TABLE_NAME;
 
+    /** @var array<string, mixed> */
     protected array $defaults = [];
 
+    /** @var list<string> */
     protected $fillable = [
         'name',
         'user_id',
@@ -27,14 +40,23 @@ class Token extends Model
 
     // scopes
 
-    public function scopeByToken($query, string $token)
+    /**
+     * @param Builder<self> $query
+     */
+    public function scopeByToken(Builder $query, string $token): void
     {
         $query->where('token', $token);
     }
 
+    /**
+     * @return BelongsTo<Authenticatable&Model, $this>
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        /** @var class-string<Authenticatable&Model> $model */
+        $model = config('auth.providers.users.model', DefaultUser::class);
+
+        return $this->belongsTo($model);
     }
 
     public function consume(): self

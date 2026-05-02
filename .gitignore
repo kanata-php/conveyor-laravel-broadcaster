@@ -1,2 +1,10 @@
-vendor
-
+vendor/
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+.php-cs-fixer.cache
+.phpcs-cache
+.idea/
+.vscode/
+*.log
+.DS_Store

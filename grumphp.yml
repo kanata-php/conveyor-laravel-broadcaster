@@ -6,6 +6,9 @@ grumphp:
         phpcs:
             standard:
                 - PSR12
+            triggered_by: [php]
+            ignore_patterns:
+                - tests/
 #        shell:
 #            scripts:
 #                - [ "-c", "./vendor/bin/phpstan analyse" ]
