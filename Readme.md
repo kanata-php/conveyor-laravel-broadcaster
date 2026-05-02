@@ -7,6 +7,14 @@ This package allows the usage of Conveyor as a broadcasting driver in Laravel.
 
 > To understand how to broadcast with Laravel, visit [Broadcasting](https://laravel.com/docs/11.x/broadcasting).
 
+## Requirements
+
+- PHP `^8.2`
+- Laravel 11 or 12
+- A running Conveyor WebSocket server (see [Extra](#extra-simple-conveyor-server-for-this-example))
+
+> The companion server package [`kanata-php/socket-conveyor`](https://packagist.org/packages/kanata-php/socket-conveyor) declares `ext-openswoole: ^22`. This package overrides the platform requirement via `config.platform` in `composer.json`, so newer openswoole versions install cleanly without `--ignore-platform-req` flags.
+
 ## Quick Start
 
 **Table of Contents**
@@ -16,8 +24,9 @@ This package allows the usage of Conveyor as a broadcasting driver in Laravel.
 - [Step 3: Add Service Provider](#step-3-add-service-provider)
 - [Step 4: Enable Laravel broadcasting](#step-4-enable-laravel-broadcasting)
 - [Step 5: Add broadcasting config](#step-5-add-broadcasting-config)
-- [Step 6: Migrate the database](#step-6-migrate-the-database)
-- [Step 7: Install the Conveyor JS Client](#step-7-install-the-conveyor-js-client)
+- [Step 6: Set configuration](#step-6-set-configuration)
+- [Step 7: Create the tokens table](#step-7-create-the-tokens-table)
+- [Step 8: Install the Conveyor JS Client](#step-8-install-the-conveyor-js-client)
 - [Extra: Simple Conveyor Server for this example](#extra-simple-conveyor-server-for-this-example)
 
 #### Step 1: Install the package via composer
@@ -81,6 +90,7 @@ return [
         'protocol' => env('CONVEYOR_PROTOCOL', 'ws'),
         'host' => env('CONVEYOR_URI', 'localhost'),
         'port' => env('CONVEYOR_PORT', 8181),
+        'query' => env('CONVEYOR_QUERY', ''),
     ],
 ];
 ```
@@ -101,7 +111,52 @@ CONVEYOR_QUERY="token=my-secure-conveyor-token"
 
 > `CONVEYOR_QUERY` is the url query where we add the token you set to protect your WebSocket server.
 
-#### Step 7: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
+#### Step 7: Create the tokens table
+
+This package issues short-lived JWT tokens stored in a `conveyor_tokens` table. The package no longer ships a migration, so you must add one in your application:
+
+```bash
+php artisan make:migration create_conveyor_tokens_table
+```
+
+Then in the generated migration:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('conveyor_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->foreignId('user_id');
+            $table->string('aud')->nullable();
+            $table->text('token');
+            $table->string('aud_protocol')->nullable();
+            $table->integer('allowed_uses')->nullable();
+            $table->integer('uses')->nullable();
+            $table->dateTime('expire_at')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('conveyor_tokens');
+    }
+};
+```
+
+```bash
+php artisan migrate
+```
+
+#### Step 8: Install the [Conveyor JS Client](https://www.npmjs.com/package/socket-conveyor-client):
 
 ```bash
 npm install socket-conveyor-client
@@ -243,4 +298,8 @@ use Conveyor\Events\PreServerStartEvent;
     ->start();
 ```
 
-Remember to install conveyor with `composer require kanata-php/conveyor` and run the server with `php server.php`.
+Remember to install conveyor with `composer require kanata-php/socket-conveyor` and run the server with `php server.php`.
+
+## License
+
+Released under the [MIT License](LICENSE).

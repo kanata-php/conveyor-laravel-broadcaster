@@ -51,6 +51,9 @@
     "config": {
         "allow-plugins": {
             "phpro/grumphp": true
+        },
+        "platform": {
+            "ext-openswoole": "22.1.0"
         }
     }
 }
