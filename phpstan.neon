@@ -1,8 +1,10 @@
 includes:
-    - phpstan-baseline.neon
+    - vendor/larastan/larastan/extension.neon
 parameters:
     level: 6
+    reportUnmatchedIgnoredErrors: false
     paths:
         - src
-        - database
         - config
+    configDirectories:
+        - %currentWorkingDirectory%/config

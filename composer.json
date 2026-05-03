@@ -1,9 +1,15 @@
 {
     "name": "kanata-php/conveyor-laravel-broadcaster",
     "description": "Conveyor Laravel Broadcaster",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Kanata\\LaravelBroadcaster\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kanata\\LaravelBroadcaster\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -12,13 +18,28 @@
         }
     ],
     "require": {
-        "firebase/php-jwt": "^6.4"
+        "php": "^8.2",
+        "firebase/php-jwt": "^6.10 || ^7.0"
     },
     "require-dev": {
         "phpro/grumphp": "*",
-        "squizlabs/php_codesniffer": "^3.7",
-        "phpstan/phpstan": "^1.10",
-        "friendsofphp/php-cs-fixer": "^3.41"
+        "squizlabs/php_codesniffer": "^3.10",
+        "phpstan/phpstan": "^2.0",
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "illuminate/support": "^11.0 || ^12.0",
+        "illuminate/database": "^11.0 || ^12.0",
+        "illuminate/contracts": "^11.0 || ^12.0",
+        "illuminate/queue": "^11.0 || ^12.0",
+        "illuminate/console": "^11.0 || ^12.0",
+        "illuminate/broadcasting": "^11.0 || ^12.0",
+        "kanata-php/socket-conveyor": "^3.0-beta",
+        "guzzlehttp/guzzle": "^7.0",
+        "illuminate/http": "^11.0 || ^12.0",
+        "illuminate/auth": "^11.0 || ^12.0",
+        "larastan/larastan": "^3.0",
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "phpunit/phpunit": "^11.0",
+        "mockery/mockery": "^1.6"
     },
     "extra": {
         "laravel": {
@@ -30,6 +51,9 @@
     "config": {
         "allow-plugins": {
             "phpro/grumphp": true
+        },
+        "platform": {
+            "ext-openswoole": "22.1.0"
         }
     }
 }

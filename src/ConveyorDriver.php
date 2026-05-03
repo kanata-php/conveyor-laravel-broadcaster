@@ -2,11 +2,14 @@
 
 namespace Kanata\LaravelBroadcaster;
 
-use App\Models\User;
 use Conveyor\SubProtocols\Conveyor\Persistence\Interfaces\UserAssocPersistenceInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster as BaseBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as DefaultUser;
+use Illuminate\Http\Request;
 use Kanata\LaravelBroadcaster\Models\Token;
 use Kanata\LaravelBroadcaster\Services\JwtToken;
 use Ramsey\Uuid\Uuid;
@@ -21,6 +24,10 @@ class ConveyorDriver extends BaseBroadcaster
     ) {
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function auth($request)
     {
         $channelName = $this->normalizeChannelName(
@@ -43,12 +50,20 @@ class ConveyorDriver extends BaseBroadcaster
         );
     }
 
+    /**
+     * @param Request $request
+     * @param mixed $result
+     * @return array<string, string>
+     */
     public function validAuthenticationResponse($request, $result)
     {
+        /** @var Authenticatable $user */
+        $user = auth()->user();
+
         return [
             'auth' => JwtToken::create(
                 name: Uuid::uuid4()->toString(),
-                userId: auth()->user()->id,
+                userId: (int) $user->getAuthIdentifier(),
                 expire: null,
                 useLimit: 1,
             )->token,
@@ -62,8 +77,9 @@ class ConveyorDriver extends BaseBroadcaster
      */
     public function validateConnection(string $token): void
     {
-        $tokenModel = new Token;
+        $tokenModel = new Token();
         $tokenModel->setConnection(config('conveyor.database-driver'));
+        /** @phpstan-ignore-next-line method.notFound (scopeByToken) */
         $tokenInstance = $tokenModel->byToken($token)->first();
 
         if (null === $tokenInstance || null === $tokenInstance->user) {
@@ -74,9 +90,9 @@ class ConveyorDriver extends BaseBroadcaster
     }
 
     /**
-     * @param array $channels
+     * @param array<int, mixed> $channels
      * @param string $event
-     * @param array $payload
+     * @param array<string, mixed> $payload
      * @return void
      */
     public function broadcast(array $channels, $event, array $payload = [])
@@ -86,13 +102,13 @@ class ConveyorDriver extends BaseBroadcaster
 
     /**
      * @param int $fd
-     * @param User|null $user
+     * @param (Authenticatable&Model)|null $user
      * @param ?UserAssocPersistenceInterface $assocPersistence
      * @return void
      */
     public function associateUser(
         int $fd,
-        ?User $user,
+        ?Authenticatable $user,
         ?UserAssocPersistenceInterface $assocPersistence,
     ): void {
         if (null === $user || null === $assocPersistence) {
@@ -101,18 +117,24 @@ class ConveyorDriver extends BaseBroadcaster
 
         $assocPersistence->assoc(
             fd: $fd,
-            userId: $user->id,
+            userId: (int) $user->getAuthIdentifier(),
         );
     }
 
+    /**
+     * @return (Authenticatable&Model)|null
+     */
     public function getAssocUser(
         int $fd,
         ?UserAssocPersistenceInterface $assocPersistence,
-    ): ?User {
+    ): ?Authenticatable {
         if (null === $assocPersistence) {
             return null;
         }
 
-        return User::find($assocPersistence->getAssoc(fd: $fd));
+        /** @var class-string<Authenticatable&Model> $model */
+        $model = config('auth.providers.users.model', DefaultUser::class);
+
+        return $model::find($assocPersistence->getAssoc(fd: $fd));
     }
 }
